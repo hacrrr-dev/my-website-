@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Tracker</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        #location-info {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Location Tracker</h1>
+    <div id="map"></div>
+    <div id="location-info"></div>
+    <script>
+        let map;
+        let userMarker;
+        let watchId;
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 15,
+                center: { lat: 0, lng: 0 }
+            });
+        }
+
+        function updateLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            if (!userMarker) {
+                userMarker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map,
+                    title: 'Your Location'
+                });
+            } else {
+                userMarker.setPosition({ lat, lng });
+            }
+
+            map.setCenter({ lat, lng });
+            document.getElementById('location-info').innerText = `Latitude: ${lat}, Longitude: ${lng}`;
+        }
+
+        function startTracking() {
+            if (navigator.geolocation) {
+                watchId = navigator.geolocation.watchPosition(updateLocation, handleError, { enableHighAccuracy: true });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        function handleError(error) {
+            console.error('Error occurred while tracking location:', error);
+            alert('Error occurred while tracking location.');
+        }
+
+        window.onload = function() {
+            initMap();
+            startTracking();
+        };
+    </script>
+</body>
+</html>
